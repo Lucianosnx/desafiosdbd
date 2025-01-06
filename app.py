@@ -1,12 +1,14 @@
 import streamlit as st
-import pathlib
+import streamlit.components.v1 as components
 
-# Ler o arquivo HTML que você postou (por exemplo, "index.html")
-html_path = pathlib.Path("index.html")
-html_content = html_path.read_text(encoding="utf-8")
+# Lê o conteúdo inteiro do seu arquivo HTML
+with open("index.html", "r", encoding="utf-8") as f:
+    html_content = f.read()
 
-# Usar st.components.v1.html para injetar o conteúdo
-st.set_page_config(page_title="Sorteio Desafios DbD", layout="wide")
-
-st.markdown("# Sorteio Desafios Dead By Daylight (via HTML embed)")
-st.components.v1.html(html_content, height=2000, scrolling=True)
+# Exibe dentro do Streamlit
+components.html(
+    html_content,
+    height=800,   # Ajuste a altura que você preferir
+    width=None,   # Se quiser definir uma largura específica, pode passar aqui
+    scrolling=True
+)
