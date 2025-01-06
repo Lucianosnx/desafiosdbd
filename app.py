@@ -1,9 +1,24 @@
 import random
 import streamlit as st
 
-# ========= DADOS ========= #
+# ========== CONFIGURAÇÕES INICIAIS ==========
 
-# Desafios Killer
+# CSS para centralizar conteúdo e dar um visual melhor
+st.markdown("""
+<style>
+/* Centralizar todo o conteúdo da página */
+main.block-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.title("Sorteio Desafios Dead By Daylight")
+
+# ========== DADOS (LISTAS) ==========
+
 DESAFIOS_KILLER = [
     "sem perks",
     "não pode deixar concluir 5 gens",
@@ -35,7 +50,6 @@ DESAFIOS_KILLER = [
     "não pode hitar personagens femininos (até remover os masculinos)"
 ]
 
-# Killers e imagens
 KILLERS = [
     "The Trapper",
     "The Wraith",
@@ -69,7 +83,7 @@ KILLERS = [
     "The Knight",
     "The Skull Merchant",
     "The Xenomorph",
-    # Exemplos placeholders (já que alguns não existem no DBD real):
+    # Exemplos fictícios
     "Charles Lee Ray (The Good Guy)",
     "Unknown (The Unknown)",
     "Vecna (The Lich)",
@@ -110,7 +124,8 @@ KILLER_IMAGES = {
     "The Knight": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/8/86/K30_TheKnight_Portrait.png",
     "The Skull Merchant": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/a/ac/K31_TheSkullMerchant_Portrait.png",
     "The Xenomorph": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/3b/K32_TheXenomorph_Portrait.png",
-    # Placeholders
+
+    # Fictícios (placeholders)
     "Charles Lee Ray (The Good Guy)": "https://via.placeholder.com/200?text=Charles+Lee+Ray",
     "Unknown (The Unknown)": "https://via.placeholder.com/200?text=Unknown",
     "Vecna (The Lich)": "https://via.placeholder.com/200?text=Vecna",
@@ -118,7 +133,6 @@ KILLER_IMAGES = {
     "Portia Maye (The Houndmaster)": "https://via.placeholder.com/200?text=Portia+Maye"
 }
 
-# Desafios Survivors
 DESAFIOS_SURVIVORS = [
     "sem perks",
     "sem dropar pallets",
@@ -147,8 +161,8 @@ DESAFIOS_SURVIVORS = [
     "2 flashlight ou 2 pallet save"
 ]
 
-# Para evitar re-roll infinito do mesmo item,
-# usamos session_state para salvar os desafios sorteados.
+# ========== SESSION STATE ==========
+
 if "desafios_killer" not in st.session_state:
     st.session_state["desafios_killer"] = []
 if "desafios_survivors" not in st.session_state:
@@ -163,161 +177,142 @@ if "escapes" not in st.session_state:
     st.session_state["escapes"] = None
 
 
-# ========= FUNÇÕES ========= #
+# ========== FUNÇÕES ==========
 
-def capitalizar_primeira_letra(s: str) -> str:
-    if not s:
-        return s
-    return s[0].upper() + s[1:]
+def capitalizar(texto: str) -> str:
+    if not texto:
+        return texto
+    return texto[0].upper() + texto[1:]
 
 
+# --- Killer ---
 def sortear_desafios_killer():
-    """Sorteia 4 desafios (únicos) para o killer."""
     st.session_state["desafios_killer"] = random.sample(DESAFIOS_KILLER, 4)
 
-
-def reroll_killer(index):
-    """Re-roll de um único desafio."""
-    todos = set(DESAFIOS_KILLER)
-    ja_sorteados = set(st.session_state["desafios_killer"])
-    # Remove o que já está sorteado para não sortear de novo
-    disponiveis = list(todos - ja_sorteados)
-
-    if len(disponiveis) > 0:
-        novo = random.choice(disponiveis)
+def reroll_desafio_killer(index):
+    disponiveis = set(DESAFIOS_KILLER) - set(st.session_state["desafios_killer"])
+    if disponiveis:
+        novo = random.choice(list(disponiveis))
         st.session_state["desafios_killer"][index] = novo
     else:
-        # Caso extremo: não há mais desafios disponíveis
-        st.warning("Todos os desafios possíveis já foram sorteados!")
-
+        st.warning("Não há mais desafios disponíveis para re-roll.")
 
 def sortear_killer():
-    """Sorteia um killer aleatório e guarda a imagem."""
-    killer_aleatorio = random.choice(KILLERS)
-    st.session_state["killer_atual"] = killer_aleatorio
-    st.session_state["killer_img"] = KILLER_IMAGES.get(killer_aleatorio, None)
-
+    sorteado = random.choice(KILLERS)
+    st.session_state["killer_atual"] = sorteado
+    st.session_state["killer_img"] = KILLER_IMAGES.get(sorteado)
 
 def sortear_mortes():
-    """Sorteia de 1 a 4 mortes."""
-    st.session_state["mortes"] = random.randint(1, 4)
-
+    st.session_state["mortes"] = random.randint(1,4)
 
 def sortear_tudo_killer():
     sortear_desafios_killer()
     sortear_killer()
     sortear_mortes()
 
-
+# --- Survivors ---
 def sortear_desafios_survivors():
-    """Sorteia 4 desafios (únicos) para survivors."""
     st.session_state["desafios_survivors"] = random.sample(DESAFIOS_SURVIVORS, 4)
 
-
-def reroll_survivors(index):
-    """Re-roll de um único desafio de survivors."""
-    todos = set(DESAFIOS_SURVIVORS)
-    ja_sorteados = set(st.session_state["desafios_survivors"])
-    disponiveis = list(todos - ja_sorteados)
-
-    if len(disponiveis) > 0:
-        novo = random.choice(disponiveis)
+def reroll_desafio_survivors(index):
+    disponiveis = set(DESAFIOS_SURVIVORS) - set(st.session_state["desafios_survivors"])
+    if disponiveis:
+        novo = random.choice(list(disponiveis))
         st.session_state["desafios_survivors"][index] = novo
     else:
-        st.warning("Todos os desafios possíveis já foram sorteados!")
-
+        st.warning("Não há mais desafios disponíveis para re-roll.")
 
 def sortear_escapes():
-    """Sorteia de 1 a 4 escapes."""
-    st.session_state["escapes"] = random.randint(1, 4)
-
+    st.session_state["escapes"] = random.randint(1,4)
 
 def sortear_tudo_survivors():
     sortear_desafios_survivors()
     sortear_escapes()
 
 
-# ========= LAYOUT STREAMLIT ========= #
+# ========== LAYOUT COM TABS ==========
 
-st.title("Sorteio Desafios Dead By Daylight")
-
-# Criamos abas (a partir do Streamlit 1.10+):
 tab_killer, tab_survivors = st.tabs(["Killer", "Survivors"])
 
+# ========== ABA: KILLER ==========
+
 with tab_killer:
-    # Colunas para organização: uma para "Desafios" e outra para "Killer Sorteado"
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Desafios (Killer)")
-
-        # Botão de Sortear Desafios
+    with st.container():
+        st.subheader("1) Desafios (Killer)")
+        # Botão principal para sortear 4 desafios
         if st.button("Sortear Desafios (Killer)"):
             sortear_desafios_killer()
 
-        # Exibir os desafios sorteados
+        # Mostrar cada desafio
         for i, desafio in enumerate(st.session_state["desafios_killer"]):
-            cols = st.columns([4,1])  # 4 partes pra texto, 1 pro botão
+            cols = st.columns([4,1])  # 4 partes pro texto, 1 pro botão
             with cols[0]:
-                st.write(f"- {capitalizar_primeira_letra(desafio)}")
+                st.info(capitalizar(desafio))
             with cols[1]:
-                # Botão Reroll pra cada desafio
+                # Botão Reroll
                 if st.button(f"Reroll {i+1}", key=f"reroll_killer_{i}"):
-                    reroll_killer(i)
+                    reroll_desafio_killer(i)
 
-    with col2:
-        st.subheader("Killer Sorteado")
-        # Botão sortear killer
+    with st.container():
+        st.subheader("2) Killer Sorteado")
+        # Botão para sortear 1 killer
         if st.button("Sortear Killer"):
             sortear_killer()
-        # Exibir killer
+
+        # Mostrar killer sorteado
         if st.session_state["killer_atual"]:
-            st.write(st.session_state["killer_atual"])
+            st.markdown(f"**{st.session_state['killer_atual']}**")
             if st.session_state["killer_img"]:
                 st.image(st.session_state["killer_img"], width=200)
 
-    # Sortear Mortes (abaixo ou ao lado, a depender do tamanho de tela)
-    st.subheader("Mortes Necessárias (1 a 4)")
-    # Botão sortear mortes
-    if st.button("Sortear Mortes"):
-        sortear_mortes()
-    if st.session_state["mortes"] is not None:
-        st.write(f"**Mortes:** {st.session_state['mortes']}")
+    with st.container():
+        st.subheader("3) Mortes Necessárias (1 a 4)")
+        # Botão para sortear mortes
+        if st.button("Sortear Mortes"):
+            sortear_mortes()
 
-    st.markdown("---")
-    # Botão sortear tudo
-    if st.button("Sortear Tudo (Killer)"):
-        sortear_tudo_killer()
+        # Mostrar mortes
+        if st.session_state["mortes"] is not None:
+            st.markdown(f"**Mortes:** {st.session_state['mortes']}")
+
+    # Botão para sortear tudo
+    with st.container():
+        if st.button("Sortear Tudo (Killer)"):
+            sortear_tudo_killer()
+
+# ========== ABA: SURVIVORS ==========
 
 with tab_survivors:
-    # Colunas para organização: uma para "Desafios" e outra para "Escapes Necessários"
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Desafios (Survivors)")
+    with st.container():
+        st.subheader("1) Desafios (Survivors)")
+        # Botão para sortear 4 desafios
         if st.button("Sortear Desafios (Survivors)"):
             sortear_desafios_survivors()
 
+        # Mostrar cada desafio
         for i, desafio in enumerate(st.session_state["desafios_survivors"]):
             cols = st.columns([4,1])
             with cols[0]:
-                st.write(f"- {capitalizar_primeira_letra(desafio)}")
+                st.info(capitalizar(desafio))
             with cols[1]:
+                # Botão Reroll
                 if st.button(f"Reroll S{i+1}", key=f"reroll_survivor_{i}"):
-                    reroll_survivors(i)
+                    reroll_desafio_survivors(i)
 
-    with col2:
-        st.subheader("Escapes Necessários (1 a 4)")
+    with st.container():
+        st.subheader("2) Escapes Necessários (1 a 4)")
+        # Botão para sortear escapes
         if st.button("Sortear Escapes"):
             sortear_escapes()
+
+        # Mostrar escapes
         if st.session_state["escapes"] is not None:
-            st.write(f"**Escapes:** {st.session_state['escapes']}")
+            st.markdown(f"**Escapes:** {st.session_state['escapes']}")
 
-    st.markdown("---")
-    if st.button("Sortear Tudo (Survivors)"):
-        sortear_tudo_survivors()
+    # Botão para sortear tudo
+    with st.container():
+        if st.button("Sortear Tudo (Survivors)"):
+            sortear_tudo_survivors()
 
-
-# Rodapé
 st.markdown("---")
 st.caption("Feito por Sinnex - @lucianosnx")
