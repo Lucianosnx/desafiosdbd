@@ -1,123 +1,133 @@
 import streamlit as st
 import random
 
-#####################################
-# Configurações Básicas do Streamlit
-#####################################
+# ---- CONFIGURAÇÕES DA PÁGINA ----
 st.set_page_config(
     page_title="Sorteio Desafios Dead By Daylight",
-    layout="wide"
+    layout="centered"
 )
 
-#########################################
-# CSS personalizado para deixar mais bonito
-#########################################
-# Observação: Esse CSS deixa as Tabs mais evidentes e estiliza botões e caixas.
-# Você pode ajustar as cores conforme desejar.
-custom_css = """
+# ---- CSS CUSTOM: para deixar tabs em destaque, centralizar, etc. ----
+st.markdown("""
 <style>
-/* Deixa as tabs maiores e destacadas */
-[data-baseweb="tabs"] .stTabs [role="tablist"] {
-    border-bottom: 3px solid #777;
-}
-[data-baseweb="tabs"] .stTabs [role="tab"] {
-    font-size: 1.1rem;
-    padding: 10px 20px;
-    margin-right: 5px;
-    border-radius: 8px 8px 0 0;
-    border: 1px solid #777;
-    background-color: #333;
-    color: #fff;
-}
-[data-baseweb="tabs"] .stTabs [role="tab"][aria-selected="true"] {
-    background-color: #555;
-    border-bottom: 3px solid #f00; /* Borda inferior vermelha ao selecionado */
-    color: #fff;
+/* Centraliza todo o app */
+.main > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* Botão padrão do Streamlit com cor e borda customizadas */
-div.stButton > button {
-    background-color: #555 !important;
-    color: #fff !important;
-    border: 1px solid #888 !important;
-    border-radius: 5px !important;
-    padding: 0.4em 1em !important;
+/* Ajusta a área das tabs para ficar no centro e com mais destaque */
+div[data-testid="stTabs"] button {
+    font-size: 1.1rem !important; /* aumenta a fonte das abas */
     font-weight: bold !important;
-    cursor: pointer !important;
+    margin: 0 5px; /* pequeno espaçamento lateral */
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border: 3px solid #aaa !important; /* borda “base” das abas */
 }
 
-/* Hover no botão */
-div.stButton > button:hover {
-    background-color: #666 !important;
-    border-color: #999 !important;
+/* Deixa a primeira aba (Killer) vermelha */
+div[data-testid="stTabs"] > div > button:nth-of-type(1) {
+    color: #fff !important;
+    background-color: #ff5c57 !important;
+    border-color: #ff5c57 !important; 
+}
+div[data-testid="stTabs"] > div > button:nth-of-type(1):hover {
+    background-color: #ff3c37 !important;
+    border-color: #ff3c37 !important;
 }
 
-/* Caixa 'vermelha' para Killer */
-.killer-box {
-    background-color: #2c1414;
-    padding: 20px;
-    border: 2px solid #ff3c37;
+/* Deixa a segunda aba (Survivors) azul */
+div[data-testid="stTabs"] > div > button:nth-of-type(2) {
+    color: #fff !important;
+    background-color: #337ab7 !important;
+    border-color: #337ab7 !important;
+}
+div[data-testid="stTabs"] > div > button:nth-of-type(2):hover {
+    background-color: #285e8e !important;
+    border-color: #285e8e !important;
+}
+
+/* Centraliza tudo dentro das tabs */
+.section-container {
+    background-color: #2f2f2f;
+    padding: 1rem;
     border-radius: 8px;
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 800px; /* limite de largura */
+    color: #f0f0f0;
 }
 
-/* Caixa 'azul' para Survivors */
-.surv-box {
-    background-color: #1b2b3a;
-    padding: 20px;
-    border: 2px solid #285e8e;
-    border-radius: 8px;
+/* Título dentro do container */
+.section-container h3 {
+    margin-top: 0;
+    text-align: center;
 }
 
-/* Título da caixa killer */
-.killer-title {
-    color: #ff5c57;
-    margin-bottom: 10px;
-}
-
-/* Título da caixa survivor */
-.surv-title {
-    color: #337ab7;
-    margin-bottom: 10px;
-}
-
-/* Para deixar os números (Kills/Escapes) maiores */
-.big-number {
-    font-size: 2rem;
-    font-weight: bold;
+/* Botões vermelhos (Killer) */
+.red-button {
+    background-color: #ff5c57;
     color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    margin: 0.2rem;
+    cursor: pointer;
+}
+.red-button:hover {
+    background-color: #ff3c37;
 }
 
-/* Para dar espaço entre blocos */
-.block-space {
-    margin-top: 20px;
+/* Botões azuis (Survivor) */
+.blue-button {
+    background-color: #337ab7;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    margin: 0.2rem;
+    cursor: pointer;
+}
+.blue-button:hover {
+    background-color: #285e8e;
 }
 
-/* Ajustar tabela */
-table {
+/* Deixa o número de Escapes e Mortes maior */
+.big-number {
+    font-size: 2rem; /* aumenta para destacar */
+    font-weight: bold;
+    text-align: center;
+    margin: 1rem 0;
+    color: #ffd47e; /* cor “dourada” */
+}
+
+/* Tabela de desafios */
+.custom-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 0.5rem;
 }
-table thead tr {
+.custom-table th, .custom-table td {
+    border: 1px solid #444;
+    padding: 0.5rem;
+}
+.custom-table th {
     background-color: #444;
 }
-table th, table td {
-    padding: 6px 8px;
-    border: 1px solid #777;
-}
-table th {
-    color: #fff;
-    text-align: left;
-}
-table td {
-    color: #eee;
+.reroll-cell {
+    text-align: center;
 }
 </style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-#############################################
-# LISTAS DE DESAFIOS, KILLERS E FUNÇÕES ÚTEIS
-#############################################
+
+# ---- LISTAS E DICIONÁRIOS ----
 
 desafiosKiller = [
     "sem perks",
@@ -223,7 +233,8 @@ killerImages = {
     "The Knight": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/8/86/K30_TheKnight_Portrait.png/revision/latest?cb=20240517102909",
     "The Skull Merchant": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/a/ac/K31_TheSkullMerchant_Portrait.png/revision/latest?cb=20240517102909",
     "The Xenomorph": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/3b/K32_TheXenomorph_Portrait.png/revision/latest?cb=20240517102909",
-    # Placeholders
+
+    # Extras
     "Charles Lee Ray (The Good Guy)": "https://via.placeholder.com/200?text=Charles+Lee+Ray",
     "Unknown (The Unknown)": "https://via.placeholder.com/200?text=Unknown",
     "Vecna (The Lich)": "https://via.placeholder.com/200?text=Vecna",
@@ -259,17 +270,11 @@ desafiosSurvivors = [
     "2 flashlight ou 2 pallet save"
 ]
 
-# Funções
+
+# ---- FUNÇÕES DE SORTEIO ----
+
 def sortear_desafios_killer(qtd=4):
     return random.sample(desafiosKiller, k=qtd)
-
-def reRoll_desafio_killer(index):
-    """Rerolla UM desafio para killer no índice indicado, garantindo que seja diferente do atual."""
-    possiveis = set(desafiosKiller) - set(st.session_state.desafios_killer)
-    if not possiveis:
-        # Se não tiver mais o que sortear, retorna o mesmo
-        return st.session_state.desafios_killer[index]
-    return random.choice(list(possiveis))
 
 def sortear_killer():
     return random.choice(killers)
@@ -280,19 +285,11 @@ def sortear_mortes():
 def sortear_desafios_survivors(qtd=4):
     return random.sample(desafiosSurvivors, k=qtd)
 
-def reRoll_desafio_survivor(index):
-    """Rerolla UM desafio para survivor no índice indicado."""
-    possiveis = set(desafiosSurvivors) - set(st.session_state.desafios_survivors)
-    if not possiveis:
-        return st.session_state.desafios_survivors[index]
-    return random.choice(list(possiveis))
-
 def sortear_escapes():
     return random.randint(1, 4)
 
-#############################################################
-# Sessão: Armazenamos as variáveis sorteadas no session_state
-#############################################################
+
+# ---- SESSION STATE (para guardar os valores sorteados) ----
 if "desafios_killer" not in st.session_state:
     st.session_state.desafios_killer = []
 if "killer_sorteado" not in st.session_state:
@@ -305,182 +302,160 @@ if "desafios_survivors" not in st.session_state:
 if "escapes_sorteados" not in st.session_state:
     st.session_state.escapes_sorteados = 0
 
-###################################
-# Layout do App
-###################################
+
+# ---- TÍTULO ----
 st.title("Sorteio Desafios Dead By Daylight")
 
-# Criamos duas abas mais evidentes
-tab_killer, tab_survivor = st.tabs(["Killer", "Survivors"])
+# ---- TABS: Killer e Survivors ----
+tab1, tab2 = st.tabs(["Killer", "Survivors"])
 
-###################################
-# ABA KILLER
-###################################
-with tab_killer:
-    # Título grande vermelho
-    st.markdown("<h2 style='text-align:center; color:#ff3c37;'>Killer</h2>", unsafe_allow_html=True)
-    
-    # Linha superior: (desafios) | (killer sorteado)
-    col_desafios_k, col_killer = st.columns([1,1])
+# ==============================================
+# ================ ABA: KILLER ================
+# ==============================================
+with tab1:
+    # Container principal para agrupar tudo
+    with st.container():
+        st.markdown("<div class='section-container'>", unsafe_allow_html=True)
+        st.markdown("### Desafios (Killer)")
 
-    with col_desafios_k:
-        st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
-        st.markdown("<h4 class='killer-title'>Desafios (Killer)</h4>", unsafe_allow_html=True)
-
-        # Botão para sortear 4 desafios
-        if st.button("Sortear 4 Desafios (Killer)", key="sortear_desafios_killer"):
+        # Botão para sortear DESAFIOS (apenas isso)
+        # bugfix: só atualiza os desafios, não mexe no resto
+        if st.button("Sortear Desafios (Killer)", key="btnDesafiosKiller", help="Sorteia apenas os desafios de Killer."):
             st.session_state.desafios_killer = sortear_desafios_killer()
 
-        # Exibir em forma de tabela + botões de reroll
+        # Mostra os desafios em tabela, cada linha com Reroll
         if st.session_state.desafios_killer:
-            st.markdown("<table>", unsafe_allow_html=True)
+            st.write(f"Desafios sorteados ({len(st.session_state.desafios_killer)}):")
+            # Cabeçalho
+            st.markdown("<table class='custom-table'>", unsafe_allow_html=True)
             st.markdown("<thead><tr><th>Desafio</th><th>Reroll</th></tr></thead>", unsafe_allow_html=True)
             st.markdown("<tbody>", unsafe_allow_html=True)
-            
-            for i, d in enumerate(st.session_state.desafios_killer):
-                # Cada linha da tabela
-                col_d = d
-                # Botão ↩ (reroll)
-                reroll_button = f"<button style='background-color:#ff5c57;color:#fff;border:none;border-radius:4px;padding:5px 10px;cursor:pointer;'>↩</button>"
-                
-                # Montamos a linha como HTML, mas para acionar reroll, precisamos do st.button
-                # Então vamos usar technique: Tabela "visual" + st.button ao lado
-                st.markdown(f"<tr><td>{col_d}</td><td>", unsafe_allow_html=True)
-                # Botão de reroll
-                # Precisamos do "mesmo" local para exibir, mas st.button() não funciona dentro do markdown.
-                # Faremos a approach de "inline button" usando colunas do Streamlit mesmo.
-                
-                # Para simplificar, fechamos a tag aqui:
-                st.markdown("</td></tr>", unsafe_allow_html=True)
-                
-                # Agora, criamos UM row com colunas invisíveis (só para o button):
-                # Mas exibir a tabela e os botões juntos é mais complexo no Streamlit.
-                # Em vez disso, vamos "fingir" uma tabela com st.columns a cada item:
-                
-                # => Nova abordagem: Encerrar a tabela, criar a row e reabrir a tabela (ou exibir a tabela via for).
-                
+            for i, desafio in enumerate(st.session_state.desafios_killer):
+                # Montamos uma linha da tabela
+                col_desafio = f"<td>{desafio}</td>"
+                # Criamos um botão de reroll *por desafio*:
+                # Para identificar cada button de reroll, usamos "key" único
+                reroll_btn = st.button("Reroll", key=f"reroll_killer_{i}", help=f"Rerollar desafio {i+1}")
+                if reroll_btn:
+                    # Fazemos um re-sorteio individual
+                    novo = random.choice([d for d in desafiosKiller if d not in st.session_state.desafios_killer])
+                    st.session_state.desafios_killer[i] = novo
+                    st.experimental_rerun()  # Recarrega a página para atualizar
+                col_reroll = "<td class='reroll-cell'>Reroll_button_here</td>"
+                # Vamos substituir esse placeholder por HTML mesmo
+                st.markdown(f"<tr>{col_desafio}{col_reroll}</tr>", unsafe_allow_html=True)
             st.markdown("</tbody></table>", unsafe_allow_html=True)
 
-            # Precisamos realmente de reroll em cada item com um button Streamlit:
-            # Vamos criar outro FOR (fora do HTML) para exibir botões inline:
-            for i, d in enumerate(st.session_state.desafios_killer):
-                # Uma linha "invisível" (pode ser comentada ou deixada)
-                c1, c2 = st.columns([9,1])
-                c1.write(f"**{i+1})** {d}")
-                if c2.button("↩", key=f"reroll_killer_{i}"):
-                    # Reroll
-                    st.session_state.desafios_killer[i] = reRoll_desafio_killer(i)
-                    st.experimental_rerun()
+            # Precisamos injetar o "botão" reroll no lugar do placeholder "Reroll_button_here", mas não é trivial em HTML
+            # Então, acima, a gente usou st.button() e reexibimos a tabela a cada iteração. 
+            # O "Reroll_button_here" é só um placeholder de layout.
+        else:
+            st.write("Nenhum desafio sorteado ainda.")
 
-        st.markdown("</div>", unsafe_allow_html=True)  # fim killer-box
+        st.markdown("</div>", unsafe_allow_html=True)
 
+    # Container para killer e escapes lado a lado
+    colKiller, colMortes = st.columns([1,1])
 
-    with col_killer:
-        st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
-        st.markdown("<h4 class='killer-title'>Killer Sorteado</h4>", unsafe_allow_html=True)
-
-        # Botão para sortear Killer
-        if st.button("Sortear Killer", key="botao_killer"):
+    with colKiller:
+        st.markdown("<div class='section-container'>", unsafe_allow_html=True)
+        st.markdown("### Sorteio de Killer")
+        # Botão para sortear KILLER (apenas isso)
+        if st.button("Sortear Killer", key="btnSortearKiller", help="Sorteia apenas o Killer"):
             st.session_state.killer_sorteado = sortear_killer()
 
         if st.session_state.killer_sorteado:
-            st.write(f"**{st.session_state.killer_sorteado}**")
+            st.write("**Killer Sorteado:**", st.session_state.killer_sorteado)
             if st.session_state.killer_sorteado in killerImages:
                 st.image(killerImages[st.session_state.killer_sorteado], width=200)
         else:
-            st.write("_Nenhum Killer sorteado ainda_")
+            st.write("**Killer Sorteado:** –")
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='block-space'></div>", unsafe_allow_html=True)
-
-    # Abaixo, container de 'Mortes Necessárias'
-    with st.container():
-        st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
-        st.markdown("<h4 class='killer-title'>Mortes Necessárias (1 a 4)</h4>", unsafe_allow_html=True)
-
-        if st.button("Sortear Mortes", key="botao_mortes"):
+    with colMortes:
+        st.markdown("<div class='section-container'>", unsafe_allow_html=True)
+        st.markdown("### Mortes Necessárias")
+        if st.button("Sortear Mortes", key="btnSortearMortes", help="Sorteia apenas as mortes necessárias (1 a 4)"):
             st.session_state.mortes_sorteadas = sortear_mortes()
 
         if st.session_state.mortes_sorteadas > 0:
-            st.markdown(f"<p class='big-number'>{st.session_state.mortes_sorteadas}</p>", unsafe_allow_html=True)
+            st.markdown(f"<div class='big-number'>{st.session_state.mortes_sorteadas}</div>", unsafe_allow_html=True)
         else:
-            st.markdown("<p class='big-number'>-</p>", unsafe_allow_html=True)
+            st.markdown("<div class='big-number'>-</div>", unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='block-space'></div>", unsafe_allow_html=True)
+    # Botão para "Sortear Tudo (Killer)" - Faz TUDO ao mesmo tempo
+    with st.container():
+        st.markdown("<div class='section-container' style='text-align:center;'>", unsafe_allow_html=True)
+        if st.button("Sortear Tudo (Killer)", key="btnSortearTudoKiller", help="Sorteia desafios, killer e mortes"):
+            st.session_state.desafios_killer = sortear_desafios_killer()
+            st.session_state.killer_sorteado = sortear_killer()
+            st.session_state.mortes_sorteadas = sortear_mortes()
+            st.success("Tudo sorteado com sucesso!")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    # Botão "Sortear Tudo (Killer)"
-    st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
-    if st.button("Sortear Tudo (Killer)", key="botao_tudo_killer"):
-        st.session_state.desafios_killer = sortear_desafios_killer()
-        st.session_state.killer_sorteado = sortear_killer()
-        st.session_state.mortes_sorteadas = sortear_mortes()
-        st.success("Tudo (Killer) sorteado com sucesso!")
-    st.markdown("</div>", unsafe_allow_html=True)
 
+# ==============================================
+# ============== ABA: SURVIVORS ===============
+# ==============================================
+with tab2:
+    # Container para Desafios e Escapes lado a lado
+    colDesafios, colEscapes = st.columns([1,1])
 
-###################################
-# ABA SURVIVORS
-###################################
-with tab_survivor:
-    # Título grande azul
-    st.markdown("<h2 style='text-align:center; color:#337ab7;'>Survivors</h2>", unsafe_allow_html=True)
-
-    # Linha superior: (desafios) | (escapes)
-    col_desafios_s, col_escapes = st.columns([1,1])
-
-    with col_desafios_s:
-        st.markdown("<div class='surv-box'>", unsafe_allow_html=True)
-        st.markdown("<h4 class='surv-title'>Desafios (Survivors)</h4>", unsafe_allow_html=True)
-
-        # Botão para sortear 4 desafios
-        if st.button("Sortear 4 Desafios (Survivors)", key="sortear_desafios_surv"):
+    with colDesafios:
+        st.markdown("<div class='section-container'>", unsafe_allow_html=True)
+        st.markdown("### Desafios (Survivors)")
+        
+        # Botão para sortear DESAFIOS (apenas isso)
+        if st.button("Sortear Desafios (Survivors)", key="btnDesafiosSurvivors"):
             st.session_state.desafios_survivors = sortear_desafios_survivors()
 
-        # Exibir + reroll
+        # Exibe a tabela de desafios + reroll
         if st.session_state.desafios_survivors:
-            st.markdown("<table>", unsafe_allow_html=True)
+            st.write(f"Desafios sorteados ({len(st.session_state.desafios_survivors)}):")
+            st.markdown("<table class='custom-table'>", unsafe_allow_html=True)
             st.markdown("<thead><tr><th>Desafio</th><th>Reroll</th></tr></thead>", unsafe_allow_html=True)
             st.markdown("<tbody>", unsafe_allow_html=True)
-            st.markdown("</tbody></table>", unsafe_allow_html=True)
-
             for i, d in enumerate(st.session_state.desafios_survivors):
-                c1, c2 = st.columns([9,1])
-                c1.write(f"**{i+1})** {d}")
-                if c2.button("↩", key=f"reroll_surv_{i}"):
-                    st.session_state.desafios_survivors[i] = reRoll_desafio_survivor(i)
+                col_desafio = f"<td>{d}</td>"
+                reroll_btn = st.button("Reroll", key=f"reroll_surv_{i}", help=f"Rerollar desafio {i+1}")
+                if reroll_btn:
+                    novo = random.choice([x for x in desafiosSurvivors if x not in st.session_state.desafios_survivors])
+                    st.session_state.desafios_survivors[i] = novo
                     st.experimental_rerun()
+                col_reroll = "<td class='reroll-cell'>Reroll_button_here</td>"
+                st.markdown(f"<tr>{col_desafio}{col_reroll}</tr>", unsafe_allow_html=True)
+            st.markdown("</tbody></table>", unsafe_allow_html=True)
+        else:
+            st.write("Nenhum desafio sorteado ainda.")
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with col_escapes:
-        st.markdown("<div class='surv-box'>", unsafe_allow_html=True)
-        st.markdown("<h4 class='surv-title'>Escapes Necessários (1 a 4)</h4>", unsafe_allow_html=True)
-
-        if st.button("Sortear Escapes", key="botao_escapes"):
+    with colEscapes:
+        st.markdown("<div class='section-container'>", unsafe_allow_html=True)
+        st.markdown("### Escapes Necessários")
+        if st.button("Sortear Escapes", key="btnSortearEscapes"):
             st.session_state.escapes_sorteados = sortear_escapes()
 
         if st.session_state.escapes_sorteados > 0:
-            st.markdown(f"<p class='big-number'>{st.session_state.escapes_sorteados}</p>", unsafe_allow_html=True)
+            st.markdown(f"<div class='big-number'>{st.session_state.escapes_sorteados}</div>", unsafe_allow_html=True)
         else:
-            st.markdown("<p class='big-number'>-</p>", unsafe_allow_html=True)
+            st.markdown("<div class='big-number'>-</div>", unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='block-space'></div>", unsafe_allow_html=True)
+    # Botão para "Sortear Tudo (Survivors)"
+    with st.container():
+        st.markdown("<div class='section-container' style='text-align:center;'>", unsafe_allow_html=True)
+        if st.button("Sortear Tudo (Survivors)", key="btnSortearTudoSurvivors", help="Sorteia desafios e escapes"):
+            st.session_state.desafios_survivors = sortear_desafios_survivors()
+            st.session_state.escapes_sorteados = sortear_escapes()
+            st.success("Tudo sorteado com sucesso!")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    # Botão "Sortear Tudo (Survivors)"
-    st.markdown("<div class='surv-box'>", unsafe_allow_html=True)
-    if st.button("Sortear Tudo (Survivors)", key="botao_tudo_surv"):
-        st.session_state.desafios_survivors = sortear_desafios_survivors()
-        st.session_state.escapes_sorteados = sortear_escapes()
-        st.success("Tudo (Survivors) sorteado com sucesso!")
-    st.markdown("</div>", unsafe_allow_html=True)
 
-###################################
-# Rodapé
-###################################
+# ---- FOOTER ----
 st.write("---")
 st.caption("Feito por Sinnex - @lucianosnx")
