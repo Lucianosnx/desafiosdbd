@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sorteio Desafios Dead By Daylight</title>
+  <!-- Tornar responsivo em mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #1b1b1b;
+      color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      background: #292929;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    header h1 {
+      margin: 0;
+      color: #fff; /* Título branco */
+    }
+
+    /* Botões das abas (tab) */
+    .tab-buttons {
+      background: #2a2a2a;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      gap: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    /* Botão da aba Killer em vermelho */
+    .tab-button-killer {
+      background: #ff5c57;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .tab-button-killer:hover {
+      background: #ff3c37;
+    }
+
+    /* Botão da aba Survivors em azul */
+    .tab-button-survivors {
+      background: #337ab7;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .tab-button-survivors:hover {
+      background: #285e8e;
+    }
+
+    /* Container geral */
+    .container {
+      padding: 20px;
+      padding-bottom: 60px; /* espaço extra para o footer fixo */
+    }
+    /* Cada conteúdo de aba fica inicialmente escondido */
+    .tab-content {
+      display: none;
+      margin: 0 auto;
+      max-width: 1200px;
+    }
+
+    /* Layout flex para dispor side by side */
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap; /* para "quebrar" em telas pequenas */
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Box padrão */
+    .box {
+      background: #2f2f2f;
+      border-radius: 8px;
+      padding: 20px;
+      width: 350px;
+      max-width: 90%;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      margin: 0 auto;
+    }
+    .box h2 {
+      margin-top: 0;
+      color: #ffd47e;
+    }
+
+    /* BOTÕES VERMELHOS (KILLER) */
+    .red-button {
+      background: #ff5c57;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 8px 16px;
+      margin: 5px;
+      transition: background 0.2s ease-in-out;
+    }
+    .red-button:hover {
+      background: #ff3c37;
+    }
+
+    /* BOTÕES AZUIS (SURVIVORS) */
+    .blue-button {
+      background: #337ab7;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 8px 16px;
+      margin: 5px;
+      transition: background 0.2s ease-in-out;
+    }
+    .blue-button:hover {
+      background: #285e8e;
+    }
+
+    /* Tabelas */
+    table {
+      margin: 0 auto;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+    .killer-img {
+      width: 200px;
+      height: auto;
+      border: 2px solid #444;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+      margin-top: 10px;
+    }
+
+    /* Dar mais espaço ao botão Sortear Tudo */
+    .sortear-tudo {
+      margin-top: 30px; /* Maior espaço em cima */
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #2a2a2a;
+      color: #bbb;
+      text-align: center;
+      padding: 5px 0;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    footer p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    /* Ajustes de responsividade em telas menores */
+    @media (max-width: 768px) {
+      .flex-row {
+        flex-direction: column;
+        align-items: center;
+      }
+      .box {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sorteio Desafios Dead By Daylight</h1>
+  </header>
+
+  <!-- Botões de Abas -->
+  <div class="tab-buttons">
+    <button class="tab-button-killer" onclick="openTab('killerTab')">Killer</button>
+    <button class="tab-button-survivors" onclick="openTab('survivorTab')">Survivors</button>
+  </div>
+
+  <div class="container">
+    <!-- ABA: KILLER -->
+    <div id="killerTab" class="tab-content">
+      <!-- Linha 1: Desafios e Sorteio do Killer lado a lado -->
+      <div class="flex-row">
+        <!-- Caixa de Desafios (Killer) -->
+        <div class="box">
+          <h2>Desafios (Killer)</h2>
+          <table id="tabelaDesafiosKiller">
+            <thead>
+              <tr><th>Desafio</th><th>Reroll</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <button class="red-button" onclick="sortearDesafiosKiller()">Sortear Desafios</button>
+        </div>
+
+        <!-- Caixa de Killer -->
+        <div class="box">
+          <h2>Killer Sorteado</h2>
+          <p id="killerSorteado">--</p>
+          <img id="killerImagem" class="killer-img" src="" alt="Killer Image" style="display: none;">
+          <button class="red-button" onclick="sortearKiller()">Sortear Killer</button>
+        </div>
+      </div>
+
+      <!-- Linha 2: Mortes Necessárias embaixo -->
+      <div class="box" style="max-width: 350px;">
+        <h2>Mortes Necessárias (1 a 4)</h2>
+        <p id="numMortes">--</p>
+        <button class="red-button" onclick="sortearMortes()">Sortear Mortes</button>
+      </div>
+
+      <!-- Botão para sortear tudo (Killer), com espaçamento extra -->
+      <div class="sortear-tudo">
+        <button class="red-button" onclick="sortearTudoKiller()">Sortear Tudo (Killer)</button>
+      </div>
+    </div>
+
+    <!-- ABA: SURVIVORS -->
+    <div id="survivorTab" class="tab-content">
+      <!-- Linha 1: Desafios e Escapes lado a lado -->
+      <div class="flex-row">
+        <!-- Caixa de Desafios (Survivors) -->
+        <div class="box">
+          <h2>Desafios (Survivors)</h2>
+          <table id="tabelaDesafiosSurvivors">
+            <thead>
+              <tr><th>Desafio</th><th>Reroll</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <button class="blue-button" onclick="sortearDesafiosSurvivors()">Sortear Desafios</button>
+        </div>
+
+        <!-- Caixa de Escapes -->
+        <div class="box">
+          <h2>Escapes Necessários (1 a 4)</h2>
+          <p id="numEscapes">--</p>
+          <button class="blue-button" onclick="sortearEscapes()">Sortear Escapes</button>
+        </div>
+      </div>
+
+      <!-- Botão para sortear tudo (Survivors), com espaçamento extra -->
+      <div class="sortear-tudo">
+        <button class="blue-button" onclick="sortearTudoSurvivors()">Sortear Tudo (Survivors)</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>feito por Sinnex - @lucianosnx</p>
+  </footer>
+
+  <script>
+    /************************************************
+     *   FUNÇÃO UTILITÁRIA: CAPITALIZAR 1ª LETRA    *
+     ************************************************/
+    function capitalizeFirstLetter(str) {
+      if (!str) return str;
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    /***************************************
+     *         FUNÇÕES DE TABS
+     ***************************************/
+    function openTab(tabId) {
+      // Oculta todos
+      document.getElementById("killerTab").style.display = "none";
+      document.getElementById("survivorTab").style.display = "none";
+
+      // Exibe a tab pedida
+      document.getElementById(tabId).style.display = "block";
+    }
+    // Exibe a aba "Killer" ao carregar
+    openTab('killerTab');
+
+    /***************************************
+     *         LISTAS E FUNÇÕES (KILLER)
+     ***************************************/
+    const desafiosKiller = [
+      "sem perks",
+      "não pode deixar concluir 5 gens",
+      "não pode enganchar personagens femininos (até remover os masculinos)",
+      "não pode sluggar (derrubou tem que pegar)",
+      "não pode quebrar pallets",
+      "não pode pular janelas",
+      "não pode tunelar",
+      "não pode campar",
+      "não pode chutar gerador",
+      "não pode usar o poder do assassino",
+      "não pode ter dois sobreviventes feridos ao mesmo tempo",
+      "não pode enganchar personagens masculinos (até remover os femininos)",
+      "apenas 1 perk",
+      "apenas 2 perks",
+      "não pode dar hit com bloodlust",
+      "não pode deixar concluir 3 gens",
+      "não pode sair do trigen",
+      "não pode usar perks anti gen",
+      "só pode matar no slug",
+      "tem que ficar parado na frente do gancho",
+      "só pode hitar o primeiro sobrevivente que foi visto (até remover ele da partida)",
+      "1 minuto afk",
+      "campar no chão o primeiro sobrevivente que cair (até que ele morra)",
+      "só pode enganchar no basement",
+      "não pode usar addons",
+      "não pode demorar mais de 2 minutos para derrubar um sobrevivente",
+      "não pode hitar personagens masculinos (até remover os femininos)",
+      "não pode hitar personagens femininos (até remover os masculinos)"
+    ];
+    let desafiosKillerSorteados = [];
+
+    function sortearDesafiosKiller() {
+      const tableBody = document.querySelector("#tabelaDesafiosKiller tbody");
+      tableBody.innerHTML = ""; // limpa a tabela
+
+      desafiosKillerSorteados = [];
+
+      while (desafiosKillerSorteados.length < 4) {
+        const indexAleatorio = Math.floor(Math.random() * desafiosKiller.length);
+        const desafio = desafiosKiller[indexAleatorio];
+        if (!desafiosKillerSorteados.includes(desafio)) {
+          desafiosKillerSorteados.push(desafio);
+        }
+      }
+
+      // Exibe em tabela, capitalizando a primeira letra
+      desafiosKillerSorteados.forEach((d, index) => {
+        const tr = document.createElement("tr");
+
+        const tdDesafio = document.createElement("td");
+        tdDesafio.textContent = capitalizeFirstLetter(d);
+
+        const tdBotao = document.createElement("td");
+        const btnReroll = document.createElement("button");
+        btnReroll.textContent = "Reroll";
+        btnReroll.classList.add("red-button");
+        btnReroll.onclick = () => reRollDesafioKiller(index);
+
+        tdBotao.appendChild(btnReroll);
+        tr.appendChild(tdDesafio);
+        tr.appendChild(tdBotao);
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function reRollDesafioKiller(index) {
+      let novoDesafio;
+      do {
+        const randIndex = Math.floor(Math.random() * desafiosKiller.length);
+        novoDesafio = desafiosKiller[randIndex];
+      } while (desafiosKillerSorteados.includes(novoDesafio));
+
+      desafiosKillerSorteados[index] = novoDesafio;
+
+      // Atualiza a célula na tabela (capitalizando)
+      const tableBody = document.querySelector("#tabelaDesafiosKiller tbody");
+      const row = tableBody.querySelectorAll("tr")[index];
+      row.querySelector("td").textContent = capitalizeFirstLetter(novoDesafio);
+    }
+
+    // Killers e Imagens (exemplo com link do Wraith)
+    const killers = [
+      "The Trapper",
+      "The Wraith",
+      "The Hillbilly",
+      "The Nurse",
+      "The Shape (Michael Myers)",
+      "The Hag",
+      "The Doctor",
+      "The Huntress",
+      "The Cannibal (Leatherface)",
+      "The Nightmare (Freddy Krueger)",
+      "The Pig",
+      "The Clown",
+      "The Spirit",
+      "The Legion",
+      "The Plague",
+      "The Ghost Face",
+      "The Demogorgon",
+      "The Oni",
+      "The Deathslinger",
+      "The Executioner (Pyramid Head)",
+      "The Blight",
+      "The Twins",
+      "The Trickster",
+      "The Nemesis",
+      "The Cenobite (Pinhead)",
+      "The Artist",
+      "The Onryō (Sadako)",
+      "The Dredge",
+      "The Mastermind (Albert Wesker)",
+      "The Knight",
+      "The Skull Merchant",
+      "The Xenomorph",
+      "Charles Lee Ray (The Good Guy)",
+      "Unknown (The Unknown)",
+      "Vecna (The Lich)",
+      "Dracula (The Dark Lord)",
+      "Portia Maye (The Houndmaster)"
+    ];
+    const killerImages = {
+      "The Trapper": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/f/f4/K01_TheTrapper_Portrait.png/revision/latest?cb=20240517102909",
+      "The Wraith": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/c/c2/K02_TheWraith_Portrait.png/revision/latest?cb=20240517102909",
+      "The Hillbilly": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/a/a1/K03_TheHillbilly_Portrait.png/revision/latest?cb=20240517102909",
+      "The Nurse": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/4/4b/K04_TheNurse_Portrait.png/revision/latest?cb=20240517102909",
+      "The Shape (Michael Myers)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/4/4b/K05_TheShape_Portrait.png/revision/latest?cb=20240517102909",
+      "The Hag": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/c/c5/K06_TheHag_Portrait.png/revision/latest?cb=20240517102909",
+      "The Doctor": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/b/bd/K07_TheDoctor_Portrait.png/revision/latest?cb=20240517102909",
+      "The Huntress": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/3b/K08_TheHuntress_Portrait.png/revision/latest?cb=20240517102909",
+      "The Cannibal (Leatherface)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/0/02/K09_TheCannibal_Portrait.png/revision/latest?cb=20240517102909",
+      "The Nightmare (Freddy Krueger)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/e/ed/K10_TheNightmare_Portrait.png/revision/latest?cb=20240517102909",
+      "The Pig": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/7/71/K11_ThePig_Portrait.png/revision/latest?cb=20240517102909",
+      "The Clown": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/b/b4/K12_TheClown_Portrait.png/revision/latest?cb=20240517102909",
+      "The Spirit": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/5/53/K13_TheSpirit_Portrait.png/revision/latest?cb=20240517102909",
+      "The Legion": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/a/a2/K14_TheLegion_Portrait.png/revision/latest?cb=20240517102909",
+      "The Plague": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/3b/K15_ThePlague_Portrait.png/revision/latest?cb=20240517102909",
+      "The Ghost Face": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/7/70/K16_TheGhostFace_Portrait.png/revision/latest?cb=20240517102909",
+      "The Demogorgon": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/9/9b/K17_TheDemogorgon_Portrait.png/revision/latest?cb=20240517102909",
+      "The Oni": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/4/41/K18_TheOni_Portrait.png/revision/latest?cb=20240517102909",
+      "The Deathslinger": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/1/16/K19_TheDeathslinger_Portrait.png/revision/latest?cb=20240517102909",
+      "The Executioner (Pyramid Head)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/9/9b/K20_TheExecutioner_Portrait.png/revision/latest?cb=20240517102909",
+      "The Blight": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/f/f3/K21_TheBlight_Portrait.png/revision/latest?cb=20240517102909",
+      "The Twins": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/9/96/K22_TheTwins_Portrait.png/revision/latest?cb=20240517102909",
+      "The Trickster": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/e/e7/K23_TheTrickster_Portrait.png/revision/latest?cb=20240517102909",
+      "The Nemesis": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/37/K24_TheNemesis_Portrait.png/revision/latest?cb=20240517102909",
+      "The Cenobite (Pinhead)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/7/74/K25_TheCenobite_Portrait.png/revision/latest?cb=20240517102909",
+      "The Artist": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/d/d6/K26_TheArtist_Portrait.png/revision/latest?cb=20240517102909",
+      "The Onryō (Sadako)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/4/4e/K27_TheOnryo_Portrait.png/revision/latest?cb=20240517102909",
+      "The Dredge": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/9/9a/K28_TheDredge_Portrait.png/revision/latest?cb=20240517102909",
+      "The Mastermind (Albert Wesker)": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/0/09/K29_TheMastermind_Portrait.png/revision/latest?cb=20240517102909",
+      "The Knight": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/8/86/K30_TheKnight_Portrait.png/revision/latest?cb=20240517102909",
+      "The Skull Merchant": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/a/ac/K31_TheSkullMerchant_Portrait.png/revision/latest?cb=20240517102909",
+      "The Xenomorph": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/3b/K32_TheXenomorph_Portrait.png/revision/latest?cb=20240517102909",
+
+      /* Extras em placeholder */
+      "Charles Lee Ray (The Good Guy)": "https://via.placeholder.com/200?text=Charles+Lee+Ray",
+      "Unknown (The Unknown)": "https://via.placeholder.com/200?text=Unknown",
+      "Vecna (The Lich)": "https://via.placeholder.com/200?text=Vecna",
+      "Dracula (The Dark Lord)": "https://via.placeholder.com/200?text=Dracula",
+      "Portia Maye (The Houndmaster)": "https://via.placeholder.com/200?text=Portia+Maye"
+    };
+
+    function sortearKiller() {
+      const killerAleatorio = killers[Math.floor(Math.random() * killers.length)];
+      document.getElementById("killerSorteado").textContent = killerAleatorio;
+
+      const imgSrc = killerImages[killerAleatorio];
+      const killerImgEl = document.getElementById("killerImagem");
+      if (imgSrc) {
+        killerImgEl.src = imgSrc;
+        killerImgEl.style.display = "inline";
+      } else {
+        killerImgEl.style.display = "none";
+      }
+    }
+
+    function sortearMortes() {
+      const mortes = Math.floor(Math.random() * 4) + 1;
+      document.getElementById("numMortes").textContent = mortes;
+    }
+
+    function sortearTudoKiller() {
+      sortearDesafiosKiller();
+      sortearKiller();
+      sortearMortes();
+    }
+
+
+    /***************************************
+     *        LISTAS E FUNÇÕES (SURVIVORS)
+     ***************************************/
+    const desafiosSurvivors = [
+      "sem perks",
+      "sem dropar pallets",
+      "sem pular janelas",
+      "sem tomar gancho",
+      "sem cair",
+      "2 minutos sem fazer gen",
+      "se tomar gancho tem que quitar",
+      "sem se curar",
+      "2 perks cada",
+      "2 minutos sem ser visto",
+      "sem correr",
+      "4 personagens iguais",
+      "sempre agachado",
+      "se clicar no gen não pode mais soltar",
+      "só pode ir pro gancho tomando catch",
+      "sem itens",
+      "só pode fazer gen em dupla",
+      "se alguém morrer todos tem que quitar",
+      "somente 1 gerador pode ser reparado por vez",
+      "não pode iniciar outro gerador até completar o primeiro que foi iniciado",
+      "o primeiro gerador tem que ser concluído em trio",
+      "sem tomar hit",
+      "todos com no mither",
+      "2 minutos sem sair do armário",
+      "2 flashlight ou 2 pallet save"
+    ];
+    let desafiosSurvivorsSorteados = [];
+
+    function sortearDesafiosSurvivors() {
+      const tableBody = document.querySelector("#tabelaDesafiosSurvivors tbody");
+      tableBody.innerHTML = "";
+
+      desafiosSurvivorsSorteados = [];
+
+      while (desafiosSurvivorsSorteados.length < 4) {
+        const indexAleatorio = Math.floor(Math.random() * desafiosSurvivors.length);
+        const desafio = desafiosSurvivors[indexAleatorio];
+        if (!desafiosSurvivorsSorteados.includes(desafio)) {
+          desafiosSurvivorsSorteados.push(desafio);
+        }
+      }
+
+      desafiosSurvivorsSorteados.forEach((d, index) => {
+        const tr = document.createElement("tr");
+        const tdDesafio = document.createElement("td");
+        tdDesafio.textContent = capitalizeFirstLetter(d);
+
+        const tdBotao = document.createElement("td");
+        const btnReroll = document.createElement("button");
+        btnReroll.textContent = "Reroll";
+        btnReroll.classList.add("blue-button");
+        btnReroll.onclick = () => reRollDesafioSurvivors(index);
+
+        tdBotao.appendChild(btnReroll);
+        tr.appendChild(tdDesafio);
+        tr.appendChild(tdBotao);
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function reRollDesafioSurvivors(index) {
+      let novoDesafio;
+      do {
+        const randIndex = Math.floor(Math.random() * desafiosSurvivors.length);
+        novoDesafio = desafiosSurvivors[randIndex];
+      } while (desafiosSurvivorsSorteados.includes(novoDesafio));
+
+      desafiosSurvivorsSorteados[index] = novoDesafio;
+
+      const tableBody = document.querySelector("#tabelaDesafiosSurvivors tbody");
+      const row = tableBody.querySelectorAll("tr")[index];
+      row.querySelector("td").textContent = capitalizeFirstLetter(novoDesafio);
+    }
+
+    function sortearEscapes() {
+      const escapes = Math.floor(Math.random() * 4) + 1;
+      document.getElementById("numEscapes").textContent = escapes;
+    }
+
+    function sortearTudoSurvivors() {
+      sortearDesafiosSurvivors();
+      sortearEscapes();
+    }
+  </script>
+</body>
+</html>
