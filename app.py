@@ -1,17 +1,124 @@
 import streamlit as st
 import random
 
-# Configuração básica da página
+#####################################
+# Configurações Básicas do Streamlit
+#####################################
 st.set_page_config(
     page_title="Sorteio Desafios Dead By Daylight",
-    layout="centered"
+    layout="wide"
 )
 
-########################
-# LISTAS E DICIONÁRIOS #
-########################
+#########################################
+# CSS personalizado para deixar mais bonito
+#########################################
+# Observação: Esse CSS deixa as Tabs mais evidentes e estiliza botões e caixas.
+# Você pode ajustar as cores conforme desejar.
+custom_css = """
+<style>
+/* Deixa as tabs maiores e destacadas */
+[data-baseweb="tabs"] .stTabs [role="tablist"] {
+    border-bottom: 3px solid #777;
+}
+[data-baseweb="tabs"] .stTabs [role="tab"] {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #777;
+    background-color: #333;
+    color: #fff;
+}
+[data-baseweb="tabs"] .stTabs [role="tab"][aria-selected="true"] {
+    background-color: #555;
+    border-bottom: 3px solid #f00; /* Borda inferior vermelha ao selecionado */
+    color: #fff;
+}
 
-# Lista de desafios para Killer
+/* Botão padrão do Streamlit com cor e borda customizadas */
+div.stButton > button {
+    background-color: #555 !important;
+    color: #fff !important;
+    border: 1px solid #888 !important;
+    border-radius: 5px !important;
+    padding: 0.4em 1em !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+}
+
+/* Hover no botão */
+div.stButton > button:hover {
+    background-color: #666 !important;
+    border-color: #999 !important;
+}
+
+/* Caixa 'vermelha' para Killer */
+.killer-box {
+    background-color: #2c1414;
+    padding: 20px;
+    border: 2px solid #ff3c37;
+    border-radius: 8px;
+}
+
+/* Caixa 'azul' para Survivors */
+.surv-box {
+    background-color: #1b2b3a;
+    padding: 20px;
+    border: 2px solid #285e8e;
+    border-radius: 8px;
+}
+
+/* Título da caixa killer */
+.killer-title {
+    color: #ff5c57;
+    margin-bottom: 10px;
+}
+
+/* Título da caixa survivor */
+.surv-title {
+    color: #337ab7;
+    margin-bottom: 10px;
+}
+
+/* Para deixar os números (Kills/Escapes) maiores */
+.big-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Para dar espaço entre blocos */
+.block-space {
+    margin-top: 20px;
+}
+
+/* Ajustar tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+table thead tr {
+    background-color: #444;
+}
+table th, table td {
+    padding: 6px 8px;
+    border: 1px solid #777;
+}
+table th {
+    color: #fff;
+    text-align: left;
+}
+table td {
+    color: #eee;
+}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+#############################################
+# LISTAS DE DESAFIOS, KILLERS E FUNÇÕES ÚTEIS
+#############################################
+
 desafiosKiller = [
     "sem perks",
     "não pode deixar concluir 5 gens",
@@ -43,7 +150,6 @@ desafiosKiller = [
     "não pode hitar personagens femininos (até remover os masculinos)"
 ]
 
-# Lista de Killers
 killers = [
     "The Trapper",
     "The Wraith",
@@ -84,7 +190,6 @@ killers = [
     "Portia Maye (The Houndmaster)"
 ]
 
-# URLs de imagens de cada Killer (quando não houver imagem oficial, usamos placeholder)
 killerImages = {
     "The Trapper": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/f/f4/K01_TheTrapper_Portrait.png/revision/latest?cb=20240517102909",
     "The Wraith": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/c/c2/K02_TheWraith_Portrait.png/revision/latest?cb=20240517102909",
@@ -118,8 +223,7 @@ killerImages = {
     "The Knight": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/8/86/K30_TheKnight_Portrait.png/revision/latest?cb=20240517102909",
     "The Skull Merchant": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/a/ac/K31_TheSkullMerchant_Portrait.png/revision/latest?cb=20240517102909",
     "The Xenomorph": "https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/3/3b/K32_TheXenomorph_Portrait.png/revision/latest?cb=20240517102909",
-
-    # Extras com placeholder
+    # Placeholders
     "Charles Lee Ray (The Good Guy)": "https://via.placeholder.com/200?text=Charles+Lee+Ray",
     "Unknown (The Unknown)": "https://via.placeholder.com/200?text=Unknown",
     "Vecna (The Lich)": "https://via.placeholder.com/200?text=Vecna",
@@ -127,7 +231,6 @@ killerImages = {
     "Portia Maye (The Houndmaster)": "https://via.placeholder.com/200?text=Portia+Maye"
 }
 
-# Lista de desafios para Survivors
 desafiosSurvivors = [
     "sem perks",
     "sem dropar pallets",
@@ -156,38 +259,40 @@ desafiosSurvivors = [
     "2 flashlight ou 2 pallet save"
 ]
 
-
-#######################
-# FUNÇÕES DE SORTEIO  #
-#######################
-
+# Funções
 def sortear_desafios_killer(qtd=4):
-    """Retorna uma lista de 'qtd' desafios distintos para Killer."""
     return random.sample(desafiosKiller, k=qtd)
 
+def reRoll_desafio_killer(index):
+    """Rerolla UM desafio para killer no índice indicado, garantindo que seja diferente do atual."""
+    possiveis = set(desafiosKiller) - set(st.session_state.desafios_killer)
+    if not possiveis:
+        # Se não tiver mais o que sortear, retorna o mesmo
+        return st.session_state.desafios_killer[index]
+    return random.choice(list(possiveis))
+
 def sortear_killer():
-    """Retorna um Killer aleatório da lista 'killers'."""
     return random.choice(killers)
 
 def sortear_mortes():
-    """Retorna um valor aleatório entre 1 e 4 (mortes necessárias)."""
     return random.randint(1, 4)
 
 def sortear_desafios_survivors(qtd=4):
-    """Retorna uma lista de 'qtd' desafios distintos para Survivors."""
     return random.sample(desafiosSurvivors, k=qtd)
 
+def reRoll_desafio_survivor(index):
+    """Rerolla UM desafio para survivor no índice indicado."""
+    possiveis = set(desafiosSurvivors) - set(st.session_state.desafios_survivors)
+    if not possiveis:
+        return st.session_state.desafios_survivors[index]
+    return random.choice(list(possiveis))
+
 def sortear_escapes():
-    """Retorna um valor aleatório entre 1 e 4 (escapes necessários)."""
     return random.randint(1, 4)
 
-
-###################
-# SESSION STATE   #
-###################
-# Aqui inicializamos as variáveis de sessão que armazenam o que já foi sorteado.
-
-# Aba Killer
+#############################################################
+# Sessão: Armazenamos as variáveis sorteadas no session_state
+#############################################################
 if "desafios_killer" not in st.session_state:
     st.session_state.desafios_killer = []
 if "killer_sorteado" not in st.session_state:
@@ -195,108 +300,187 @@ if "killer_sorteado" not in st.session_state:
 if "mortes_sorteadas" not in st.session_state:
     st.session_state.mortes_sorteadas = 0
 
-# Aba Survivors
 if "desafios_survivors" not in st.session_state:
     st.session_state.desafios_survivors = []
 if "escapes_sorteados" not in st.session_state:
     st.session_state.escapes_sorteados = 0
 
-
-##############
-# LAYOUT UI  #
-##############
+###################################
+# Layout do App
+###################################
 st.title("Sorteio Desafios Dead By Daylight")
 
-# Criamos duas abas: Killer e Survivors
-tab1, tab2 = st.tabs(["Killer", "Survivors"])
+# Criamos duas abas mais evidentes
+tab_killer, tab_survivor = st.tabs(["Killer", "Survivors"])
 
-#
-# ABA: KILLER
-#
-with tab1:
-    st.subheader("Desafios (Killer)")
+###################################
+# ABA KILLER
+###################################
+with tab_killer:
+    # Título grande vermelho
+    st.markdown("<h2 style='text-align:center; color:#ff3c37;'>Killer</h2>", unsafe_allow_html=True)
+    
+    # Linha superior: (desafios) | (killer sorteado)
+    col_desafios_k, col_killer = st.columns([1,1])
 
-    # Botão para sortear DESAFIOS
-    if st.button("Sortear Desafios (Killer)"):
+    with col_desafios_k:
+        st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
+        st.markdown("<h4 class='killer-title'>Desafios (Killer)</h4>", unsafe_allow_html=True)
+
+        # Botão para sortear 4 desafios
+        if st.button("Sortear 4 Desafios (Killer)", key="sortear_desafios_killer"):
+            st.session_state.desafios_killer = sortear_desafios_killer()
+
+        # Exibir em forma de tabela + botões de reroll
+        if st.session_state.desafios_killer:
+            st.markdown("<table>", unsafe_allow_html=True)
+            st.markdown("<thead><tr><th>Desafio</th><th>Reroll</th></tr></thead>", unsafe_allow_html=True)
+            st.markdown("<tbody>", unsafe_allow_html=True)
+            
+            for i, d in enumerate(st.session_state.desafios_killer):
+                # Cada linha da tabela
+                col_d = d
+                # Botão ↩ (reroll)
+                reroll_button = f"<button style='background-color:#ff5c57;color:#fff;border:none;border-radius:4px;padding:5px 10px;cursor:pointer;'>↩</button>"
+                
+                # Montamos a linha como HTML, mas para acionar reroll, precisamos do st.button
+                # Então vamos usar technique: Tabela "visual" + st.button ao lado
+                st.markdown(f"<tr><td>{col_d}</td><td>", unsafe_allow_html=True)
+                # Botão de reroll
+                # Precisamos do "mesmo" local para exibir, mas st.button() não funciona dentro do markdown.
+                # Faremos a approach de "inline button" usando colunas do Streamlit mesmo.
+                
+                # Para simplificar, fechamos a tag aqui:
+                st.markdown("</td></tr>", unsafe_allow_html=True)
+                
+                # Agora, criamos UM row com colunas invisíveis (só para o button):
+                # Mas exibir a tabela e os botões juntos é mais complexo no Streamlit.
+                # Em vez disso, vamos "fingir" uma tabela com st.columns a cada item:
+                
+                # => Nova abordagem: Encerrar a tabela, criar a row e reabrir a tabela (ou exibir a tabela via for).
+                
+            st.markdown("</tbody></table>", unsafe_allow_html=True)
+
+            # Precisamos realmente de reroll em cada item com um button Streamlit:
+            # Vamos criar outro FOR (fora do HTML) para exibir botões inline:
+            for i, d in enumerate(st.session_state.desafios_killer):
+                # Uma linha "invisível" (pode ser comentada ou deixada)
+                c1, c2 = st.columns([9,1])
+                c1.write(f"**{i+1})** {d}")
+                if c2.button("↩", key=f"reroll_killer_{i}"):
+                    # Reroll
+                    st.session_state.desafios_killer[i] = reRoll_desafio_killer(i)
+                    st.experimental_rerun()
+
+        st.markdown("</div>", unsafe_allow_html=True)  # fim killer-box
+
+
+    with col_killer:
+        st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
+        st.markdown("<h4 class='killer-title'>Killer Sorteado</h4>", unsafe_allow_html=True)
+
+        # Botão para sortear Killer
+        if st.button("Sortear Killer", key="botao_killer"):
+            st.session_state.killer_sorteado = sortear_killer()
+
+        if st.session_state.killer_sorteado:
+            st.write(f"**{st.session_state.killer_sorteado}**")
+            if st.session_state.killer_sorteado in killerImages:
+                st.image(killerImages[st.session_state.killer_sorteado], width=200)
+        else:
+            st.write("_Nenhum Killer sorteado ainda_")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='block-space'></div>", unsafe_allow_html=True)
+
+    # Abaixo, container de 'Mortes Necessárias'
+    with st.container():
+        st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
+        st.markdown("<h4 class='killer-title'>Mortes Necessárias (1 a 4)</h4>", unsafe_allow_html=True)
+
+        if st.button("Sortear Mortes", key="botao_mortes"):
+            st.session_state.mortes_sorteadas = sortear_mortes()
+
+        if st.session_state.mortes_sorteadas > 0:
+            st.markdown(f"<p class='big-number'>{st.session_state.mortes_sorteadas}</p>", unsafe_allow_html=True)
+        else:
+            st.markdown("<p class='big-number'>-</p>", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='block-space'></div>", unsafe_allow_html=True)
+
+    # Botão "Sortear Tudo (Killer)"
+    st.markdown("<div class='killer-box'>", unsafe_allow_html=True)
+    if st.button("Sortear Tudo (Killer)", key="botao_tudo_killer"):
         st.session_state.desafios_killer = sortear_desafios_killer()
-
-    # Exibe os desafios sorteados
-    if len(st.session_state.desafios_killer) > 0:
-        st.write("**Desafios Sorteados:**")
-        for i, d in enumerate(st.session_state.desafios_killer, start=1):
-            st.write(f"{i}) {d}")
-
-    st.write("---")
-
-    # Botão para sortear KILLER
-    if st.button("Sortear Killer"):
-        st.session_state.killer_sorteado = sortear_killer()
-
-    # Exibe o Killer sorteado e a imagem correspondente, se existir
-    if st.session_state.killer_sorteado:
-        st.write("**Killer Sorteado:**", st.session_state.killer_sorteado)
-        if st.session_state.killer_sorteado in killerImages:
-            st.image(killerImages[st.session_state.killer_sorteado], width=200)
-    else:
-        st.write("**Killer Sorteado:** -")
-
-    st.write("---")
-
-    # Botão para sortear MORTES
-    if st.button("Sortear Mortes"):
-        st.session_state.mortes_sorteadas = sortear_mortes()
-    if st.session_state.mortes_sorteadas > 0:
-        st.write("**Mortes Necessárias:**", st.session_state.mortes_sorteadas)
-    else:
-        st.write("**Mortes Necessárias:** -")
-
-    st.write("---")
-
-    # Botão para "Sortear Tudo"
-    if st.button("Sortear Tudo (Killer)"):
-        st.session_state.desafios_killer = sortear_desafios_killer()
         st.session_state.killer_sorteado = sortear_killer()
         st.session_state.mortes_sorteadas = sortear_mortes()
-        st.success("Tudo sorteado com sucesso!")
+        st.success("Tudo (Killer) sorteado com sucesso!")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
-#
-# ABA: SURVIVORS
-#
-with tab2:
-    st.subheader("Desafios (Survivors)")
+###################################
+# ABA SURVIVORS
+###################################
+with tab_survivor:
+    # Título grande azul
+    st.markdown("<h2 style='text-align:center; color:#337ab7;'>Survivors</h2>", unsafe_allow_html=True)
 
-    # Botão para sortear DESAFIOS
-    if st.button("Sortear Desafios (Survivors)"):
+    # Linha superior: (desafios) | (escapes)
+    col_desafios_s, col_escapes = st.columns([1,1])
+
+    with col_desafios_s:
+        st.markdown("<div class='surv-box'>", unsafe_allow_html=True)
+        st.markdown("<h4 class='surv-title'>Desafios (Survivors)</h4>", unsafe_allow_html=True)
+
+        # Botão para sortear 4 desafios
+        if st.button("Sortear 4 Desafios (Survivors)", key="sortear_desafios_surv"):
+            st.session_state.desafios_survivors = sortear_desafios_survivors()
+
+        # Exibir + reroll
+        if st.session_state.desafios_survivors:
+            st.markdown("<table>", unsafe_allow_html=True)
+            st.markdown("<thead><tr><th>Desafio</th><th>Reroll</th></tr></thead>", unsafe_allow_html=True)
+            st.markdown("<tbody>", unsafe_allow_html=True)
+            st.markdown("</tbody></table>", unsafe_allow_html=True)
+
+            for i, d in enumerate(st.session_state.desafios_survivors):
+                c1, c2 = st.columns([9,1])
+                c1.write(f"**{i+1})** {d}")
+                if c2.button("↩", key=f"reroll_surv_{i}"):
+                    st.session_state.desafios_survivors[i] = reRoll_desafio_survivor(i)
+                    st.experimental_rerun()
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_escapes:
+        st.markdown("<div class='surv-box'>", unsafe_allow_html=True)
+        st.markdown("<h4 class='surv-title'>Escapes Necessários (1 a 4)</h4>", unsafe_allow_html=True)
+
+        if st.button("Sortear Escapes", key="botao_escapes"):
+            st.session_state.escapes_sorteados = sortear_escapes()
+
+        if st.session_state.escapes_sorteados > 0:
+            st.markdown(f"<p class='big-number'>{st.session_state.escapes_sorteados}</p>", unsafe_allow_html=True)
+        else:
+            st.markdown("<p class='big-number'>-</p>", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='block-space'></div>", unsafe_allow_html=True)
+
+    # Botão "Sortear Tudo (Survivors)"
+    st.markdown("<div class='surv-box'>", unsafe_allow_html=True)
+    if st.button("Sortear Tudo (Survivors)", key="botao_tudo_surv"):
         st.session_state.desafios_survivors = sortear_desafios_survivors()
-
-    # Exibe os desafios sorteados
-    if len(st.session_state.desafios_survivors) > 0:
-        st.write("**Desafios Sorteados:**")
-        for i, d in enumerate(st.session_state.desafios_survivors, start=1):
-            st.write(f"{i}) {d}")
-
-    st.write("---")
-
-    # Botão para sortear ESCAPES
-    if st.button("Sortear Escapes"):
         st.session_state.escapes_sorteados = sortear_escapes()
-    if st.session_state.escapes_sorteados > 0:
-        st.write("**Escapes Necessários:**", st.session_state.escapes_sorteados)
-    else:
-        st.write("**Escapes Necessários:** -")
+        st.success("Tudo (Survivors) sorteado com sucesso!")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.write("---")
-
-    # Botão para "Sortear Tudo"
-    if st.button("Sortear Tudo (Survivors)"):
-        st.session_state.desafios_survivors = sortear_desafios_survivors()
-        st.session_state.escapes_sorteados = sortear_escapes()
-        st.success("Tudo sorteado com sucesso!")
-
-
-#################
-# FOOTER / RODAPÉ
-#################
+###################################
+# Rodapé
+###################################
 st.write("---")
 st.caption("Feito por Sinnex - @lucianosnx")
