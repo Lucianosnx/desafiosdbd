@@ -15,20 +15,5 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 html_file = os.path.join(current_dir, 'index.html')
 html_content = get_html_content(html_file)
 
-# Injetar CSS para remover margens padrão do Streamlit e ajustar altura
-st.markdown("""
-    <style>
-    /* Remove padding e margens padrão do Streamlit */
-    .css-18e3th9 {
-        padding: 0;
-    }
-    /* Ajusta a altura do iframe para ocupar a tela inteira */
-    iframe {
-        height: 100vh !important;
-        width: 100vw !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 # Embutir o HTML no Streamlit
 components.html(html_content, height=2000, width=2000, scrolling=True)
