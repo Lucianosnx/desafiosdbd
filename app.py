@@ -5,8 +5,6 @@ import os
 st.set_page_config(layout="wide")
 
 def main():
-    st.title("Exibição de index.html no Streamlit")
-
     # Caminho para o arquivo index.html
     html_file = "index.html"
 
