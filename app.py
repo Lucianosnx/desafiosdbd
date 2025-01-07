@@ -8,6 +8,21 @@ def main():
     # Caminho para o arquivo index.html
     html_file = "index.html"
 
+        # Injetar CSS para remover margens e paddings padrão do Streamlit
+    st.markdown("""
+        <style>
+        /* Remove o padding e margin padrão do Streamlit */
+        .css-18e3th9 {
+            padding: 0;
+            margin: 0;
+        }
+        /* Remove o cabeçalho e o rodapé do Streamlit */
+        header, footer {
+            visibility: hidden;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
     # Verifica se o arquivo existe
     if os.path.exists(html_file):
         with open(html_file, 'r', encoding='utf-8') as f:
