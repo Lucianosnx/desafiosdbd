@@ -1,35 +1,24 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import os
 
-# Configurar a página para layout wide (ocupando toda a largura da tela)
+# Configura a página para o modo "wide"
 st.set_page_config(layout="wide")
 
-# Função para ler o conteúdo do arquivo HTML
-def load_html(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return file.read()
+def main():
+    st.title("Exibição de index.html no Streamlit")
 
-# Obter o caminho absoluto do arquivo HTML
-current_dir = os.path.dirname(os.path.abspath(__file__))
-html_file = os.path.join(current_dir, 'index.html')
+    # Caminho para o arquivo index.html
+    html_file = "index.html"
 
-# Verificar se o arquivo HTML existe
-if not os.path.exists(html_file):
-    st.error(f"O arquivo {html_file} não foi encontrado.")
-else:
-    # Ler o conteúdo do HTML
-    html_content = load_html(html_file)
+    # Verifica se o arquivo existe
+    if os.path.exists(html_file):
+        with open(html_file, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        # Exibe o conteúdo HTML usando componentes do Streamlit
+        st.components.v1.html(html_content, scrolling=True, height=800)
+    else:
+        st.error(f"O arquivo {html_file} não foi encontrado.")
 
-    # Embutir o HTML no Streamlit dentro de um div que ocupa toda a tela
-    html_code = f"""
-    <div class="full-screen-iframe">
-        {html_content}
-    </div>
-    """
-
-    # Determinar uma altura e largura suficientemente grande para acomodar diferentes tamanhos de tela
-    # Como Streamlit requer valores numéricos, usamos um valor alto e confiamos no CSS para ajustar
-    components.html(
-        html_code
-    )
+if __name__ == "__main__":
+    main()
