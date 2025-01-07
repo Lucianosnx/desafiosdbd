@@ -60,7 +60,5 @@ else:
     # Como Streamlit requer valores numéricos, usamos um valor alto e confiamos no CSS para ajustar
     components.html(
         html_code,
-        height=2000,  # Valor alto para acomodar conteúdos maiores
-        width=2000,   # Valor alto para acomodar conteúdos mais largos
         scrolling=False  # Desativa a rolagem do iframe
     )
