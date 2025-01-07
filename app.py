@@ -39,7 +39,5 @@ else:
     # Embutir o HTML no Streamlit
     components.html(
         html_content,
-        height=2000,  # Ajuste conforme a altura do seu conteúdo
-        width=2000,   # Ajuste conforme a largura do seu conteúdo
         scrolling=True
     )
