@@ -28,3 +28,8 @@ else:
     </div>
     """
 
+    # Determinar uma altura e largura suficientemente grande para acomodar diferentes tamanhos de tela
+    # Como Streamlit requer valores numéricos, usamos um valor alto e confiamos no CSS para ajustar
+    components.html(
+        html_code
+    )
