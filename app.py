@@ -8,32 +8,6 @@ def main():
     # Caminho para o arquivo index.html
     html_file = "index.html"
 
-    # Injetar CSS para remover margens e paddings padrão do Streamlit e ajustar o iframe
-    st.markdown("""
-        <style>
-        /* Remove o padding e margin padrão do Streamlit */
-        .block-container {
-            padding: 0;
-            margin: 0;
-        }
-        /* Remove o cabeçalho e o rodapé do Streamlit */
-        header, footer {
-            visibility: hidden;
-        }
-        /* Ajusta o iframe para ocupar toda a tela */
-        .full-screen-iframe {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 150vh;
-            border: none;
-            margin: 0;
-            padding: 0;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
     # Verifica se o arquivo existe
     if os.path.exists(html_file):
         with open(html_file, 'r', encoding='utf-8') as f:
